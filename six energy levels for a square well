@@ -1,0 +1,256 @@
+clc;%initialise
+clear;
+h=1;%planck's constant
+m=1;%the mass of the particle
+N=100;%number of steps
+delta_x=0.01;%spatial step size
+x=(delta_x:delta_x:delta_x*N);
+L=delta_x*N;
+A=L.^-(1/2);
+k_e=pi./(2*L);
+E_e1=(h.^2.*(k_e).^2)./(2*m)%energy
+E_e3=(h.^2.*(k_e.*3).^2)./(2*m)
+E_e5=(h.^2.*(k_e.*5).^2)./(2*m)
+p_e1=h.*k_e
+p_e3=h.*k_e.*3
+p_e5=h.*k_e.*5
+
+psi_e1=A*cos(k_e.*x);
+psi_e3=A*cos(k_e.*3.*x);
+psi_e5=A*cos(k_e.*5.*x);
+
+k_o=pi./L;
+E_o1=(h.^2.*(k_o).^2)./(2*m)
+E_o2=(h.^2.*(k_o.*2).^2)./(2*m)
+E_o3=(h.^2.*(k_o.*3).^2)./(2*m)
+
+p_o1=h.*k_o
+p_o2=h.*k_o.*2
+p_o3=h.*k_o.*3
+psi_o1=A*sin(k_o.*x);
+psi_o2=A*sin(k_o.*2.*x);
+psi_o3=A*sin(k_o.*3.*x);
+
+subplot(632)%n=6
+plot(x,psi_o3,'b')
+hold on 
+box off
+plot(-x,-psi_o3,'b')
+plot([-L L],[0 0],'k')
+axis([-L L -A A])
+xticks([-L -L/2 0 L/2 L])
+xticklabels({'',' ','',' ',''})
+axis([-L L -A A])
+yticks([-A -A/2 0 A/2 A])
+yticklabels({'',' ','',' ','\psi_6'})
+hold off
+
+subplot(633)%n=6
+plot(x,psi_o3.^2,'r')
+box off
+hold on 
+plot(-x,psi_o3.^2,'r')
+plot([-L L],[0 0],'k')
+axis([-L L -A A])
+xticks([-L -L/2 0 L/2 L])
+xticklabels({'',' ','',' ',''})
+yticks([-A -A/2 0 A/2 A])
+yticklabels({'',' ','n=6          ',' ','|\psi_6|^2'})
+%title({'(c)',''})
+hold off
+
+subplot(635)%n=5
+plot(x,psi_e5,'b')
+box off
+hold on
+plot(-x,psi_e5,'b')
+plot([-L L],[0 0],'k')
+axis([-L L -A A])
+xticks([-L -L/2 0 L/2 L])
+xticklabels({'',' ','',' ',''})
+yticks([-A -A/2 0 A/2 A])
+axis([-L L -A A])
+xticks([-L -L/2 0 L/2 L])
+xticklabels({'',' ','',' ',''})
+yticks([-A -A/2 0 A/2 A])
+yticklabels({'',' ','',' ','\psi_5'})
+hold off
+
+subplot(636)%n=5
+plot(x,psi_e5.^2,'r')
+box off
+hold on
+plot(-x,psi_e5.^2,'r')
+plot([-L L],[0 0],'k')
+axis([-L L -A A])
+xticks([-L -L/2 0 L/2 L])
+xticklabels({'',' ','',' ',''})
+yticks([-A -A/2 0 A/2 A])
+axis([-L L -A A])
+xticks([-L -L/2 0 L/2 L])
+xticklabels({'',' ','',' ',''})
+yticks([-A -A/2 0 A/2 A])
+yticklabels({'',' ','n=5          ',' ','|\psi_5|^2'})
+hold off
+
+subplot(638)%n=4
+plot(x,psi_o2,'b');
+box off
+hold on
+plot(-x,-psi_o2,'b')
+plot([-L L],[0 0],'k')
+axis([-L L -A A])
+xticks([-L -L/2 0 L/2 L])
+xticklabels({'',' ','',' ',''})
+yticks([-A -A/2 0 A/2 A])
+axis([-L L -A A])
+xticks([-L -L/2 0 L/2 L])
+xticklabels({'',' ','',' ',''})
+yticks([-A -A/2 0 A/2 A])
+yticklabels({'',' ','',' ','\psi_4'})
+hold off
+
+subplot(639)%n=4
+plot(x,psi_o2.^2,'r');
+box off
+hold on
+plot(-x,psi_o2.^2,'r')
+plot([-L L],[0 0],'k')
+axis([-L L -A A])
+xticks([-L -L/2 0 L/2 L])
+xticklabels({'',' ','',' ',''})
+yticks([-A -A/2 0 A/2 A])
+axis([-L L -A A])
+xticks([-L -L/2 0 L/2 L])
+xticklabels({'',' ','',' ',''})
+yticks([-A -A/2 0 A/2 A])
+yticklabels({'',' ','n=4          ',' ','|\psi_4|^2'})
+hold off
+
+subplot(6,3,11)%n=3
+plot(x,psi_e3,'b');
+box off
+hold on
+plot(-x,psi_e3,'b')
+plot([-L L],[0 0],'k')
+axis([-L L -A A])
+xticks([-L -L/2 0 L/2 L])
+xticklabels({'-L',' ','0',' ','L'})
+yticks([-A -A/2 0 A/2 A])
+axis([-L L -A A])
+xticks([-L -L/2 0 L/2 L])
+xticklabels({'-L',' ','0',' ','L'})
+yticks([-A -A/2 0 A/2 A])
+yticklabels({'',' ','',' ','\psi_3'})
+hold off
+
+subplot(6,3,12)%n=3
+plot(x,psi_e3.^2,'r');
+box off
+hold on
+plot(-x,psi_e3.^2,'r');
+plot([-L L],[0 0],'k')
+axis([-L L -A A])
+xticks([-L -L/2 0 L/2 L])
+xticklabels({'-L',' ','0',' ','L'})
+yticks([-A -A/2 0 A/2 A])
+axis([-L L -A A])
+xticks([-L -L/2 0 L/2 L])
+xticklabels({'-L',' ','0',' ','L'})
+yticks([-A -A/2 0 A/2 A])
+yticklabels({'',' ','n=3          ',' ','|\psi_3|^2'})
+hold off
+
+subplot(6,3,14)%n=2
+plot(x,psi_o1,'b');
+box off
+hold on
+plot(-x,psi_o1,'b')
+plot([-L L],[0 0],'k')
+axis([-L L -A A])
+xticks([-L -L/2 0 L/2 L])
+xticklabels({'-L',' ','0',' ','L'})
+yticks([-A -A/2 0 A/2 A])
+axis([-L L -A A])
+xticks([-L -L/2 0 L/2 L])
+xticklabels({'-L',' ','0',' ','L'})
+yticks([-A -A/2 0 A/2 A])
+yticklabels({'',' ','',' ','\psi_2'})
+hold off
+
+subplot(6,3,15)%n=2
+plot(x,psi_o1.^2,'r');
+box off
+hold on
+plot(-x,psi_o1.^2,'r');
+plot([-L L],[0 0],'k')
+axis([-L L -A A])
+xticks([-L -L/2 0 L/2 L])
+xticklabels({'-L',' ','0',' ','L'})
+yticks([-A -A/2 0 A/2 A])
+axis([-L L -A A])
+xticks([-L -L/2 0 L/2 L])
+xticklabels({'-L',' ','0',' ','L'})
+yticks([-A -A/2 0 A/2 A])
+yticklabels({'',' ','n=2          ',' ','|\psi_2|^2'})
+hold off
+
+subplot(6,3,17)%n=1
+plot(x,psi_e1,'b');
+box off
+hold on
+plot(-x,psi_e1,'b')
+plot([-L L],[0 0],'k')
+axis([-L L -A A])
+xticks([-L -L/2 0 L/2 L])
+xticklabels({'-L',' ','0',' ','L'})
+yticks([-A -A/2 0 A/2 A])
+axis([-L L -A A])
+xticks([-L -L/2 0 L/2 L])
+xticklabels({'-L',' ','0',' ','L'})
+yticks([-A -A/2 0 A/2 A])
+yticklabels({'',' ','',' ','\psi_1'})
+hold off
+
+subplot(6,3,18)%n=1
+plot(x,psi_e1.^2,'r');
+box off
+hold on
+plot(-x,psi_e1.^2,'r');
+plot([-L L],[0 0],'k')
+axis([-L L -A A])
+xticks([-L -L/2 0 L/2 L])
+xticklabels({'-L',' ','0',' ','L'})
+yticks([-A -A/2 0 A/2 A])
+axis([-L L -A A])
+xticks([-L -L/2 0 L/2 L])
+xticklabels({'-L',' ','0',' ','L'})
+yticks([-A -A/2 0 A/2 A])
+yticklabels({'',' ','n=1          ',' ','|\psi_1|^2'})
+hold off
+
+subplot(6,3,[1,4,7,10,13,16])
+ax1 = gca; % current axes
+    ax1.XColor = 'k';
+    ax1.YColor = 'w';
+box off
+hold on
+axis([-L L 0 45])
+xticks([-L -L/2 0 L/2 L])
+xticklabels({'-L',' ','0',' ','L'})
+plot([0,0],[0,45],'k')
+plot([L,L],[0,45],'k')
+plot([-L,-L],[0,45],'k')
+plot([0.1,-0.1],[1.2337,1.2337],'k')
+plot([0.1,-0.1],[4.9348,4.9348],'k')
+plot([0.1,-0.1],[11.1033,11.1033],'k')
+plot([0.1,-0.1],[19.7392,19.7392],'k')
+plot([0.1,-0.1],[30.8425,30.8425],'k')
+plot([0.1,-0.1],[44.4132,44.4132],'k')
+text(0.2,1.2337,'E_1')
+text(0.2,4.9348,'E_2')
+text(0.2,11.1033,'E_3')
+text(0.2,19.7392,'E_4')
+text(0.2,30.8425,'E_5')
+text(0.2,44.4132,'E_6')
+hold off
