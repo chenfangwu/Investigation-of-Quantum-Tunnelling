@@ -1,0 +1,74 @@
+clc% Initialise
+clear;
+N=200;%number of steps
+delta_x=0.01;
+x=(delta_x: delta_x: N*delta_x);
+E_initial=2% ground energy level 
+%E_initial=15% second energy level 
+%E_initial=34% third energy level 
+%E_initial=65% fourth energy level 
+%E_initial=104% fifth energy level 
+
+delta_E=0.05;%decreasing by 0.025
+V= zeros(1, N); 
+V(100:N) =1000;%potential energy
+b= 1.5;%cutoff paramater
+last_diverge=0
+minimum_delta_E=0.005;
+E=E_initial
+%%
+while abs(delta_E)>minimum_delta_E % Initialise
+psi= zeros(1, N)
+psi(1)=1
+psi(2)=1
+% Calculate wavefunction
+[psi,i]=calculate_psi(psi, N, delta_x, E, b,V)
+% Visualise results with movie
+%subplot(211)
+plot(x-0.01,psi,'b-','Linewidth',3)%right
+    ax1 = gca; % current axes
+    ax1.XColor = 'k';
+    ax1.YColor = 'b';
+hold on
+plot(-x+0.01,psi,'b-','Linewidth',3)%left
+axis([-2 2 -2 2]);
+title('Square well- even parity','FontSize',15) 
+xlabel('x','FontSize',15)
+ylabel('\psi','FontSize',15)
+xticks(-2:1:2)
+yticks(-2:1:2)
+%The red line shows the position of the walls of the well
+plot([1 2],[2 2],'r')
+plot([-2 -1],[2 2],'r')
+plot([-1 -1],[0 2],'r')
+plot([1 1],[0 2],'r')
+plot([-1 1],[0 0],'r')
+hold off
+if sign(psi(i+1))~=sign(last_diverge)
+% If last value of psi evaluated before
+% breakout from calculate_psi function and % last diverge are of different signs, turn
+% round direction of varying E and halve its % value
+delta_E=-(delta_E/2)
+end
+E=E+delta_E
+    str = {'  E = '};
+               text(1.2,2.1,str,'Interpreter','latex','fontsize',15)
+    str = {num2str(E)};
+               text(1.5,2.1,str,'Interpreter','latex','fontsize',15)
+    str = {' V'};
+               text(2,2.1,str,'Interpreter','latex','fontsize',15)
+last_diverge=sign(psi(i+1))
+drawnow
+pause(0.5)
+end
+
+%%
+function [psi,i] = calculate_psi(psi, N, delta_x, E, b,V) %This function calculates psi
+% Make psi_prime(0) =0 for an even parity solution;
+for i=[2:N-1]
+    psi(i+1)=2*psi(i)-psi(i-1)-2*(E-V(i))*delta_x.^2*psi(i)
+    if abs(psi(i+1)) > b % if psi is diverging, exit the loop;
+      return
+    end
+end
+end
