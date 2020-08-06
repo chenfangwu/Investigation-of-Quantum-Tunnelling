@@ -1,0 +1,231 @@
+clc;%initialise
+clear;
+h=1;%planck's constant
+m=1;%the mass of the particle
+N=200;
+delta_x=0.005;
+x=(delta_x:delta_x:delta_x*N);
+L=delta_x*N;
+A=L.^-(1/2);
+k_e=pi./(2*L);
+E_e1=(h.^2.*(k_e).^2)./(2*m)%energy
+E_e3=(h.^2.*(k_e.*3).^2)./(2*m)
+E_e5=(h.^2.*(k_e.*5).^2)./(2*m)
+E_e7=(h.^2.*(k_e.*7).^2)./(2*m)
+E_e9=(h.^2.*(k_e.*9).^2)./(2*m)
+p_e1=h.*k_e
+p_e3=h.*k_e.*3
+p_e5=h.*k_e.*5
+p_e7=h.*k_e.*7
+p_e9=h.*k_e.*9
+psi_even_1=A*cos(k_e.*x);
+psi_even_3=A*cos(k_e.*3.*x);
+psi_even_5=A*cos(k_e.*5.*x);
+psi_even_7=A*cos(k_e.*7.*x);
+psi_even_9=A*cos(k_e.*9.*x);
+
+k_o=pi./L;
+E_o1=(h.^2.*(k_o).^2)./(2*m)
+E_o2=(h.^2.*(k_o.*2).^2)./(2*m)
+E_o3=(h.^2.*(k_o.*3).^2)./(2*m)
+E_o4=(h.^2.*(k_o.*4).^2)./(2*m)
+E_o5=(h.^2.*(k_o.*5).^2)./(2*m)
+p_o1=h.*k_o
+p_o2=h.*k_o.*2
+p_o3=h.*k_o.*3
+p_o4=h.*k_o.*4
+p_o5=h.*k_o.*5
+psi_odd_1=A*sin(k_o.*x);
+psi_odd_2=A*sin(k_o.*2.*x);
+psi_odd_3=A*sin(k_o.*3.*x);
+psi_odd_4=A*sin(k_o.*4.*x);
+psi_odd_5=A*sin(k_o.*5.*x);
+
+ke=[pi./(2*L):pi./L:9*pi./(2*L)];
+ko=[pi./L:pi./L:5*pi./L];
+pe=[p_e1 p_e3 p_e5 p_e7 p_e9]
+po=[p_o1 p_o2 p_o3 p_o4 p_o5]
+
+subplot(341)
+plot(x,psi_even_1,'k');%n=1
+hold on 
+plot(-x,psi_even_1,'k')
+plot([-L L],[0 0],':k')
+axis([-L L -A A])
+xticks([-L -L/2 0 L/2 L])
+xticklabels({'-1',' ','0',' ','+1'})
+yticks([-A -A/2 0 A/2 A])
+yticklabels({'-1',' ','0',' ','+1'})
+title('\psi_1','fontsize',13)
+xlabel('x','fontsize',13)
+hold off
+
+subplot(343)
+plot(x,psi_odd_1,'k');%n=2
+hold on
+plot(-x,-psi_odd_1,'k')
+plot([-L L],[0 0],':k')
+axis([-L L -A A])
+xticks([-L -L/2 0 L/2 L])
+xticklabels({'-1',' ','0',' ','+1'})
+yticks([-A -A/2 0 A/2 A])
+yticklabels({'-1',' ','0',' ','+1'})
+title('\psi_2','fontsize',13)
+xlabel('x','fontsize',13)
+%ylabel('\psi_2','rotation',1,'fontsize',13)
+hold off
+
+subplot(345)
+plot(x,psi_even_3,'k');%n=3
+hold on 
+plot(-x,psi_even_3,'k')
+plot([-L L],[0 0],':k')
+axis([-L L -A A])
+xticks([-L -L/2 0 L/2 L])
+xticklabels({'-1',' ','0',' ','+1'})
+yticks([-A -A/2 0 A/2 A])
+yticklabels({'-1',' ','0',' ','+1'})
+title('\psi_3','fontsize',13)
+xlabel('x','fontsize',13)
+hold off
+
+subplot(347)
+plot(x,psi_odd_2,'k');%n=4
+hold on
+plot(-x,-psi_odd_2,'k')
+plot([-L L],[0 0],':k')
+axis([-L L -A A])
+xticks([-L -L/2 0 L/2 L])
+xticklabels({'-1',' ','0',' ','+1'})
+yticks([-A -A/2 0 A/2 A])
+yticklabels({'-1',' ','0',' ','+1'})
+title('\psi_4','fontsize',13)
+xlabel('x','fontsize',13)
+%ylabel('\psi_4','rotation',1,'fontsize',13)
+hold off
+
+subplot(349)
+plot(x,psi_even_5,'k');%n=5
+hold on 
+plot(-x,psi_even_5,'k')
+plot([-L L],[0 0],':k')
+axis([-L L -A A])
+xticks([-L -L/2 0 L/2 L])
+xticklabels({'-1',' ','0',' ','+1'})
+yticks([-A -A/2 0 A/2 A])
+yticklabels({'-1',' ','0',' ','+1'})
+title('\psi_5','fontsize',13)
+xlabel('x','fontsize',13)
+hold off
+
+subplot(3,4,11)
+plot(x,psi_odd_3,'k');%n=6
+hold on 
+plot(-x,-psi_odd_3,'k')
+plot([-L L],[0 0],':k')
+axis([-L L -A A])
+xticks([-L -L/2 0 L/2 L])
+xticklabels({'-1',' ','0',' ','+1'})
+yticks([-A -A/2 0 A/2 A])
+yticklabels({'-1',' ','0',' ','+1'})
+title('\psi_6','fontsize',13)
+xlabel('x','fontsize',13)
+hold off
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%integration n=1
+syms x
+fun=(psi_even_1).*conj(psi_even_1)
+single(int(fun,x,0,1))
+n=[1:1:N]
+subplot(342)
+plot(n,ans,'k')
+hold on
+plot(-n,ans,'k')
+xticks([-N 0 N])
+xticklabels({'-1','0','+1'});
+title('|\psi_1|^2','fontsize',13)
+xlabel('x')
+axis([-N N 0 1])
+hold off
+
+%%integration n=2
+fun=(psi_odd_1).*conj(psi_odd_1)
+single(int(fun,x,0,1))
+n=[1:1:N]
+subplot(344)
+plot(n,ans,'k')
+hold on
+plot(-n,ans,'k')
+xticks([-N 0 N])
+xticklabels({'-1','0','+1'});
+title('|\psi_2|^2','fontsize',13)
+xlabel('x')
+%ylabel('|\psi|^2','rotation',1,'fontsize',13)
+axis([-N N 0 1])
+hold off
+
+%%integration n=3
+syms x
+fun=(psi_even_3).*conj(psi_even_3)
+single(int(fun,x,0,1))
+n=[1:1:N]
+subplot(346)
+plot(n,ans,'k')
+hold on
+plot(-n,ans,'k')
+xticks([-N 0 N])
+xticklabels({'-1','0','+1'});
+title('|\psi_3|^2','fontsize',13)
+xlabel('x')
+axis([-N N 0 1])
+hold off
+
+%%integration n=4
+syms x
+fun=(psi_odd_2).*conj(psi_odd_2)
+single(int(fun,x,0,1))
+n=[1:1:N]
+subplot(348)
+plot(n,ans,'k')
+hold on
+plot(-n,ans,'k')
+xticks([-N 0 N])
+xticklabels({'-1','0','+1'});
+title('|\psi_4|^2','fontsize',13)
+xlabel('x')
+%ylabel('|\psi|^2','rotation',1,'fontsize',13)
+axis([-N N 0 1])
+hold off
+
+%%integration n=5
+syms x
+fun=(psi_even_5).*conj(psi_even_5)
+single(int(fun,x,0,1))
+n=[1:1:N]
+subplot(3,4,10)
+plot(n,ans,'k')
+hold on
+plot(-n,ans,'k')
+xticks([-N 0 N])
+xticklabels({'-1','0','+1'});
+title('|\psi_5|^2','fontsize',13)
+xlabel('x')
+axis([-N N 0 1])
+hold off
+
+%%integration n=6
+syms x
+fun=(psi_odd_3).*conj(psi_odd_3)
+single(int(fun,x,0,1))
+n=[1:1:N]
+subplot(3,4,12)
+plot(n,ans,'k')
+hold on
+plot(-n,ans,'k')
+xticks([-N 0 N])
+xticklabels({'-1','0','+1'});
+title('|\psi_6|^2','fontsize',13)
+xlabel('x')
+axis([-N N 0 1])
+hold off
