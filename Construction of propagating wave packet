@@ -1,0 +1,36 @@
+clear; %initialize
+delta_x=0.0005; %confining the particle to an initial wave packet of width delta_x
+x=(0:delta_x:1); %distance
+x_0=0.4;%the center of the wave packet
+C=25; %the factor C is to satisfy the normalization condition on psi
+sigma_squared=1e-3;  %sigma_squared=0.001
+%for these oscillation to be prominent,sigma>>1/k0
+k_0=500; %wave vector.k0=2pi/lambda
+psi=C*exp(-(x-x_0).^2/sigma_squared).*exp(1i*k_0*x); 
+
+subplot(221);
+plot(x,real(psi),'r');
+xticks(0:0.2:1);
+xticklabels({'0.0','0.2','0.4','0.6','0.8','1.0'});
+title('Real part'); 
+xlabel('x','fontsize',13); 
+ylabel('Real (\psi)','fontsize',13);
+axis([0 1 -30 30])
+
+subplot(222);
+plot(x,imag(psi),'b');
+xticks(0:0.2:1);
+xticklabels({'0.0','0.2','0.4','0.6','0.8','1.0'});
+title('Imaginary part'); 
+xlabel('x','fontsize',13); 
+ylabel('Imag (\psi)','fontsize',13);
+axis([0 1 -30 30])
+
+subplot(223); 
+plot(x,(conj(psi).*psi),'k'); 
+xticks(0:0.2:1);
+xticklabels({'0.0','0.2','0.4','0.6','0.8','1.0'});
+title('Probability of finding a particle '); 
+xlabel('x','fontsize',13); 
+ylabel('\psi^*\psi','fontsize',13);
+yticks([0:200:600]);
