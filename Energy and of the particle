@@ -1,0 +1,36 @@
+clc%initialise
+clear
+h=1;%planck's constant
+m=1;%the mass of the particle
+L=1;
+EE_SC=[1.2337 1.23;11.1033 11.09; 30.8425 30.81; 60.4513 60.39; 99.9297 99.83]%even parity energy
+subplot(121)
+B=bar(EE_SC)
+set(B,'edgecolor','none');
+BL = legend ((B([1 2])),{'Shooting method','Analytics calculation'},'Location','Northwest');
+set(gca,'xtick',[0, 1, 2, 3, 4,5],'xticklabel',[])
+tt(1) = text(0.9,-8,'$$\frac{\pi}{2L}$$','fontsize',7);
+tt(2) = text(1.8,-8,'$$\frac{3\pi}{2L}$$','fontsize',7);
+tt(3) = text(2.8,-8,'$$\frac{5\pi}{2L}$$','fontsize',7);
+tt(4) = text(3.8,-8,'$$\frac{7\pi}{2L}$$','fontsize',7);
+tt(5) = text(4.8,-8,'$$\frac{9\pi}{2L}$$','fontsize',7);
+text(2.9,-20,'k','fontsize',11);
+set(tt,'Interpreter','latex');
+title('Even parity')
+ylabel('E')
+
+EO_SC=[4.9348 4.93;19.7392 19.72 ;44.4132 44.37 ;78.9568 78.88;123.3701 123.25]%odd parity energy
+subplot(122)
+B=bar(EO_SC)
+set(B,'edgecolor','none');
+BL = legend ((B([1 2])),{'Shooting method','Analytics calculation'},'Location','Northwest','fontsize',9);
+set(gca,'xtick',[0, 1, 2, 3, 4,5],'xticklabel',[])
+tt(1) = text(0.9,-10,'$$\frac{\pi}{L}$$','fontsize',7);
+tt(2) = text(1.8,-10,'$$\frac{2\pi}{L}$$','fontsize',7);
+tt(3) = text(2.8,-10,'$$\frac{3\pi}{L}$$','fontsize',7);
+tt(4) = text(3.8,-10,'$$\frac{4\pi}{L}$$','fontsize',7);
+tt(5) = text(4.8,-10,'$$\frac{5\pi}{L}$$','fontsize',7);
+text(2.9,-25,'k','fontsize',11);
+set(tt,'Interpreter','latex');
+title('Odd parity')
+ylabel('E')
