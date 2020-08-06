@@ -1,0 +1,256 @@
+% %  Initialise and set up initial waveform
+clear;
+N=1000;
+x= linspace(0,1,N); 
+% Set up intial wavepacket;
+x_0=0.4;
+x_0_2=0.4;
+x_0_3=0.4;
+x_0_4=0.4;
+x_0_5=0.4;
+
+C=5;%the factor C is chosen to satisfy the normalization condition on psi
+C_2=5;
+C_3=5;
+C_4=5;
+C_5=5;
+sigma_squared=1e-3;
+sigma_squared_2=1e-3;
+sigma_squared_3=1e-3;
+sigma_squared_4=1e-3;
+sigma_squared_5=1e-3;
+k_0=1;
+k_0_2=1;
+k_0_3=1;
+k_0_4=1;
+k_0_5=1;
+% Discretisation parameters
+delta_x=1e-3;
+delta_t=5e-7;
+%  Generate an intial wavepacket
+psi=C*exp(-(x-x_0).^2/sigma_squared).*exp(1i*k_0*x);
+psi2=C_2*exp(-(x-x_0_2).^2/sigma_squared_2).*exp(1i*k_0_2*x);
+psi3=C_3*exp(-(x-x_0_3).^2/sigma_squared_3).*exp(1i*k_0_3*x);
+psi4=C_4*exp(-(x-x_0_4).^2/sigma_squared_4).*exp(1i*k_0_4*x);
+psi5=C_5*exp(-(x-x_0_5).^2/sigma_squared_5).*exp(1i*k_0_5*x);
+% % Extract the real and imaginary parts of the wavefunction 
+R_initial=real(psi);
+I_initial=imag(psi);
+R2_initial=real(psi2);
+I2_initial=imag(psi2);
+R3_initial=real(psi3);
+I3_initial=imag(psi3);
+R4_initial=real(psi4);
+I4_initial=imag(psi4);
+R5_initial=real(psi5);
+I5_initial=imag(psi5);
+V= zeros(1, N);
+x= linspace(0,1,N); 
+% Initialise current real and imaginary parts of psi
+ 
+ I_current=I_initial;
+ R_current=R_initial;
+ I2_current=I2_initial;
+ R2_current=R2_initial;
+ I3_current=I3_initial;
+ R3_current=R3_initial;
+ I4_current=I4_initial;
+ R4_current=R4_initial;
+ I5_current=I5_initial;
+ R5_current=R5_initial;
+ 
+% Initial run of Im(psi) to start off leapfrog process;
+ 
+% t=t+delta_t/2; 
+ 
+[I_next] = imag_psi(N, I_current, R_current, delta_t, delta_x, V); 
+[I2_next] = imag_psi(N, I2_current, R2_current, delta_t, delta_x, V);  
+[I3_next] = imag_psi(N, I3_current, R3_current, delta_t, delta_x, V); 
+[I4_next] = imag_psi(N, I4_current, R4_current, delta_t, delta_x, V);  
+[I5_next] = imag_psi(N, I5_current, R5_current, delta_t, delta_x, V);  
+% % Do the leapfrog!!
+% 
+ for time_step = 1:10; %wavepacket1
+% evaluate R at delta_t, 2*delta_t, 3*delta_t.......    
+%     Time is incremented by  t=t+delta_t/2 every call;   
+ 
+     [R_next]=real_psi(N, R_current, I_current, delta_t, delta_x, V);
+     
+     R_current=R_next;
+     
+    % evaluate I at (3/2)*delta_t, (5/2)*delta_t............      
+    % Time is incremented by  t=t+delta_t/2 every call;
+    
+     [I_next] = imag_psi(N, I_current, R_current, delta_t, delta_x, V); 
+      
+     % calculate psi*psi  with R(t) and  I(t+delta_t/2) and I(t-delta_t/2)      
+     
+     prob_density=R_current.^2+I_next.*I_current;
+    
+     I_current=I_next;
+    
+ end
+for time_step = 1:1000;  %wavepacket2
+% evaluate R at delta_t, 2*delta_t, 3*delta_t.......    
+%     Time is incremented by  t=t+delta_t/2 every call;   
+ 
+     
+     [R2_next]=real_psi(N, R2_current, I2_current, delta_t, delta_x, V);
+    
+     R2_current=R2_next;
+    
+    % evaluate I at (3/2)*delta_t, (5/2)*delta_t............      
+    % Time is incremented by  t=t+delta_t/2 every call;
+    
+     
+     [I2_next] = imag_psi(N, I2_current, R2_current, delta_t, delta_x, V); 
+    
+     % calculate psi*psi  with R(t) and  I(t+delta_t/2) and I(t-delta_t/2)      
+     
+    
+     prob_density2=R2_current.^2+I2_next.*I2_current;
+     
+     I2_current=I2_next;
+end
+     for time_step = 1:2000;  %wavepacket3
+% evaluate R at delta_t, 2*delta_t, 3*delta_t.......    
+%     Time is incremented by  t=t+delta_t/2 every call;   
+ 
+   
+     [R3_next]=real_psi(N, R3_current, I3_current, delta_t, delta_x, V);
+   
+     R3_current=R3_next;
+    
+    % evaluate I at (3/2)*delta_t, (5/2)*delta_t............      
+    % Time is incremented by  t=t+delta_t/2 every call;
+    
+     
+     [I3_next] = imag_psi(N, I3_current, R3_current, delta_t, delta_x, V); 
+    
+     % calculate psi*psi  with R(t) and  I(t+delta_t/2) and I(t-delta_t/2)      
+     
+    
+     prob_density3=R3_current.^2+I3_next.*I3_current;
+    
+     I3_current=I3_next;
+     end 
+     for time_step = 1:3000;   %wavepacket4
+% evaluate R at delta_t, 2*delta_t, 3*delta_t.......    
+%     Time is incremented by  t=t+delta_t/2 every call;   
+ 
+    
+     [R4_next]=real_psi(N, R4_current, I4_current, delta_t, delta_x, V);
+   
+     R4_current=R4_next;
+    
+    % evaluate I at (3/2)*delta_t, (5/2)*delta_t............      
+    % Time is incremented by  t=t+delta_t/2 every call;
+    
+     
+     [I4_next] = imag_psi(N, I4_current, R4_current, delta_t, delta_x, V); 
+    
+     % calculate psi*psi  with R(t) and  I(t+delta_t/2) and I(t-delta_t/2)      
+     
+   
+     prob_density4=R4_current.^2+I4_next.*I4_current;
+    
+     I4_current=I4_next;
+     end
+     for time_step = 1:4000;  %wavepacket5
+% evaluate R at delta_t, 2*delta_t, 3*delta_t.......    
+%     Time is incremented by  t=t+delta_t/2 every call;   
+ 
+    
+     [R5_next]=real_psi(N, R5_current, I5_current, delta_t, delta_x, V);
+    
+     R5_current=R5_next;
+    % evaluate I at (3/2)*delta_t, (5/2)*delta_t............      
+    % Time is incremented by  t=t+delta_t/2 every call;
+    
+   
+     [I5_next] = imag_psi(N, I5_current, R5_current, delta_t, delta_x, V);  
+     % calculate psi*psi  with R(t) and  I(t+delta_t/2) and I(t-delta_t/2)      
+     
+  
+     prob_density5=R5_current.^2+I5_next.*I5_current;
+    
+     I5_current=I5_next;
+     end
+% Visualise results with movie. Plot every 10 calculations for speed 
+ 
+        if rem(time_step, 10)== 0;
+               plot(x, prob_density,'k-');
+               hold on ;
+               plot(x, prob_density2,'k:'); 
+               plot(x, prob_density3,'k-.');
+               plot(x, prob_density4,'k--');
+               plot(x, prob_density5,'k--');
+               hold off
+               ylabel('\psi^*\psi','fontsize',13);  
+               yticks([0:10:30]);
+               xlabel('x','fontsize',13);
+               xticks([0:0.2:1]);
+               title('Wave packet spreading','fontsize',15);
+               str='$$t=0$$'
+               text(0.42,25,str,'Interpreter','latex','fontsize',12)
+               str='$$0.5\times10^{-3}$$'
+               text(0.43,17,str,'Interpreter','latex','fontsize',12)
+               str='$$1.0\times10^{-3}$$'
+               text(0.44,11,str,'Interpreter','latex','fontsize',12)
+               str='$$1.5\times10^{-3}$$'
+               text(0.45,7.2,str,'Interpreter','latex','fontsize',12)
+               str='$$2.0\times10^{-3}$$'
+               text(0.47,4.5,str,'Interpreter','latex','fontsize',12)
+               axis([0 1 0 30])
+               
+               
+               %box off
+               drawnow;
+              
+        end; 
+ 
+ %end;
+ 
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 
+% % Calculate the real part of the wavefunction at time t=t+delta_t,
+% t+2*delta_t etc....
+% % given the value at time t. Vectorise for speed.
+ 
+function [R_next]= real_psi(N, R_current, I_current, delta_t, delta_x, V)
+R_next= zeros(1,N);
+s=delta_t/(2*delta_x^2);
+for x=2:N-1;
+     % Calculate the real part of the wavefunction at time t=t+delta_t,
+     % given the value at time t. Vectorise for speed.
+       R_next(x)=R_current(x) - s*(I_current(x+1)-2*I_current(x)+I_current(x-1))...
+                               +delta_t*V(x).*I_current(x);
+    
+  % Boundary conditions
+  
+                           R_next(1)=R_next(2);
+                           R_next(N)=R_next(N-1);
+ 
+end;
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% 
+% % Calculate the imaginary part of the wavefunction at time
+% t=t+delta_t/2,, t + 3*delta_t/2 etc
+% % given the value at time t. 
+end
+function [I_next]= imag_psi(N, I_current, R_current, delta_t, delta_x, V)
+ I_next= zeros(1,N);
+s=delta_t/(2*delta_x^2);
+ 
+for x=2:N-1;
+     % Calculate the imaginary part of the wavefunction at time t=t+delta_t,
+     % given the value at time t. 
+       I_next(x)=I_current(x) +s*(R_current(x+1)-2*R_current(x)+R_current(x-1))...
+                               -delta_t*V(x).*R_current(x);
+      % Boundary conditions
+                          
+                           I_next(1)=I_next(2);
+                           I_next(N)=I_next(N-1);                 
+end;
+end;
