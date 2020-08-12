@@ -1,0 +1,374 @@
+clc;
+clear; 
+N=200;
+% Set up intial wavepacket;
+x_0=0.2;
+y_0=0.5;
+C=10; 
+sigma_squared=0.01; 
+k_0=100; %100, 140,150, 160
+k=pi;
+% Discretisation parameters
+delta_x=1/200; 
+delta_t=0.00001;
+%
+
+% Build a mesh for the values of the probability density function
+a= linspace(0, 1, N);
+%Use meshgrid to calculate the grid matrices for the x- and y-coordinates, %using same resolution and scales in x and y directions.
+[x,y] = meshgrid(a);
+z=x.*y;
+
+%% Create a 2D slit potential width=0.05
+%V=zeros(N,N);
+%V(1:95,100)=1e4; 
+%V(106:200,100)=1e4;
+
+%% Create a 2D slit potential width=0.1.
+V=zeros(N,N);
+V(1:90,100)=1e4;   %V=1e4, 6e3, 4e3, 2e3
+V(110:200,100)=1e4;%V=1e4, 6e3, 4e3, 2e3
+
+%% Create a 2D slit potential width=0.08
+%V=zeros(N,N);
+%V(1:92,100)=1e4; 
+%V(108:200,100)=1e4;
+
+%% Create a 2D slit potential width=0.06
+%V=zeros(N,N);
+%V(1:94,100)=1e4; 
+%V(106:200,100)=1e4;
+
+%% Create a 2D slit potential width=0.04
+%V=zeros(N,N);
+%V(1:96,100)=1e4; 
+%V(104:200,100)=1e4;
+
+%% Create a 2D slit potential width=0.2
+%V=zeros(N,N);
+%V(1:80,100)=1e4; 
+%V(121:200,100)=1e4;
+
+% Calculate psi
+psi_stationary=C*exp(-(x-x_0).^2/sigma_squared).*exp(-(y-y_0).^2/sigma_squared); 
+plane_wave = exp(1i*k_0*x);%+1i*k_0*y);
+psi_z=psi_stationary.*plane_wave;
+% % % Extract the real and imaginary parts of the wavefunction %
+R_initial=real( psi_z); 
+I_initial=imag( psi_z);
+% % Initialise current real and imaginary parts of psi %
+I_current=I_initial;
+R_current=R_initial;
+%
+% % Initial run of Im(psi) to start off leapfrog process;
+%
+%
+%[I_next] = imag_psi(N, I_current, R_current, delta_t, delta_x, V); %
+% % % Do the leapfrog!!
+%%
+for time_step = 1:350
+        T=round(delta_t.*time_step.*1E3 ,1)
+% evaluate R at delta_t, 2*delta_t, 3*delta_t.......
+%Time is incremented by t=t+delta_t/2 every call;
+[R_next]=real_psi_2D(N, R_current, I_current, delta_t, delta_x, V);
+R_current=R_next;
+% evaluate I at (3/2)*delta_t, (5/2)*delta_t............ % Time is incremented by t=t+delta_t/2 every call;
+[I_next] = imag_psi_2D(N, I_current, R_current, delta_t, delta_x, V);
+% calculate psi*psi with R(t) and I(t+delta_t/2) and I(t-delta_t/2)
+prob_density=R_current.^2+I_next.*I_current;
+I_current=I_next;
+% Visualise results with movie. Plot every 10 timesteps for speed
+
+if rem(time_step, 10)== 0
+    subplot(131)
+    p=waterfall(x,y, prob_density);
+    alpha(p,.1)
+    shading interp; %uniformity
+    ax1 = gca; % current axes
+    ax1.XColor = 'k';
+    ax1.YColor = 'k';
+    ax1.ZColor = 'w';
+hold on   
+
+%% a slit of width 0.2(1)
+%vertices_matrix = [ 0.5 0 0;0.51 0 0;0.51 0.4 0;0.5 0.4 0;0.5 0 100;0.51 0 100;0.51 0.4 100;0.5 0.4 100];
+
+%% a slit of width 0.1(1)
+vertices_matrix = [ 0.5 0 0;0.51 0 0;0.51 0.45 0;0.5 0.45 0;0.5 0 100;0.51 0 100;0.51 0.45 100;0.5 0.45 100];
+
+%% a slit of width 0.08(1)
+%vertices_matrix = [ 0.5 0 0;0.51 0 0;0.51 0.46 0;0.5 0.46 0;0.5 0 100;0.51 0 100;0.51 0.46 100;0.5 0.46 100];
+
+%% a slit of width 0.06(1)
+%vertices_matrix = [ 0.5 0 0;0.51 0 0;0.51 0.47 0;0.5 0.47 0;0.5 0 100;0.51 0 100;0.51 0.47 100;0.5 0.47 100];
+
+%% a slit of width 0.04(1)
+%vertices_matrix = [ 0.5 0 0;0.51 0 0;0.51 0.48 0;0.5 0.48 0;0.5 0 100;0.51 0 100;0.51 0.48 100;0.5 0.48 100];
+
+%% a slit of width 0.05(1)
+%vertices_matrix = [ 0.5 0 0;0.51 0 0;0.51 0.475 0;0.5 0.475 0;0.5 0 100;0.51 0 100;0.51 0.475 100;0.5 0.475 100];
+
+faces_matrix = [1 2 6 5;  2 3 7 6;3 4 8 7;4 1 5 8;1 2 3 4;5 6 7 8];
+h = patch('Vertices',vertices_matrix,'Faces',faces_matrix,...
+    'FaceVertexCData',hsv(8),'FaceColor',[0 0 1]);
+light('Position',[0.5 0.5 100],'Style','local')
+alpha(h,.5)
+view(3)
+grid on;
+
+%% a slit of width 0.2(2)
+%vertices_matrix = [ 0.5 0.605 0;0.51 0.605 0;0.51 1 0;0.5 1 0;0.5 0.605 100;0.51 0.605 100;0.51 1 100;0.5 1 100];
+
+%% a slit of width 0.1(2)
+vertices_matrix = [ 0.5 0.55 0;0.51 0.55 0;0.51 1 0;0.5 1 0;0.5 0.55 100;0.51 0.55 100;0.51 1 100;0.5 1 100];
+
+%% a slit of width 0.08(2)
+%vertices_matrix = [ 0.5 0.54 0;0.51 0.54 0;0.51 1 0;0.5 1 0;0.5 0.54 100;0.51 0.54 100;0.51 1 100;0.5 1 100];
+
+%% a slit of width 0.06(2)
+%vertices_matrix = [ 0.5 0.53 0;0.51 0.53 0;0.51 1 0;0.5 1 0;0.5 0.53 100;0.51 0.53 100;0.51 1 100;0.5 1 100];
+
+%% a slit of width 0.04(2)
+%vertices_matrix = [ 0.5 0.52 0;0.51 0.52 0;0.51 1 0;0.5 1 0;0.5 0.52 100;0.51 0.52 100;0.51 1 100;0.5 1 100];
+
+%% a slit of width 0.05(2)
+%vertices_matrix = [ 0.5 0.53 0;0.51 0.53 0;0.51 1 0;0.5 1 0;0.5 0.53 100;0.51 0.53 100;0.51 1 100;0.5 1 100];
+
+faces_matrix = [1 2 6 5;  2 3 7 6;3 4 8 7;4 1 5 8;1 2 3 4;5 6 7 8];
+h = patch('Vertices',vertices_matrix,'Faces',faces_matrix,...
+    'FaceVertexCData',hsv(8),'FaceColor',[0 0 1]);
+light('Position',[0.5 0.5 100],'Style','local')
+alpha(h,.5)
+view(3)
+grid on;
+
+axis([0 1 0 1 0 150]); 
+title('Side view','fontsize',15);
+str = {'Single slit'};
+        text(-0.6,0,140,str,'Interpreter','latex','fontsize',15)
+        str = {'Time = ',num2str(T)};
+        text(-0.6,0,100,str,'Interpreter','latex','fontsize',15)
+        str = {' ms'};
+        text(-0.35,0,95,str,'Interpreter','latex','fontsize',15)
+        xlabel('x','fontsize',13);
+        ylabel('y','fontsize',13);
+        xticks([0:0.5:1])
+        yticks([0:0.5:1])
+        zticks([0:50:100])
+        zlabel('\psi^*\psi','fontsize',13);
+        hold off;
+        view([0,0])
+        colormap('jet') 
+        colorbar
+        drawnow;
+        grid off; 
+        box off;
+
+        subplot(132)
+    p=waterfall(x,y, prob_density);
+    alpha(p,.1)
+    shading interp; %uniformity
+    ax1 = gca; % current axes
+    ax1.XColor = 'k';
+    ax1.YColor = 'k';
+    ax1.ZColor = 'w';
+hold on   
+
+%% a slit of width 0.2(1)
+%vertices_matrix = [ 0.5 0 0;0.51 0 0;0.51 0.4 0;0.5 0.4 0;0.5 0 100;0.51 0 100;0.51 0.4 100;0.5 0.4 100];
+
+%% a slit of width 0.1(1)
+vertices_matrix = [ 0.5 0 0;0.51 0 0;0.51 0.45 0;0.5 0.45 0;0.5 0 100;0.51 0 100;0.51 0.45 100;0.5 0.45 100];
+
+%% a slit of width 0.08(1)
+%vertices_matrix = [ 0.5 0 0;0.51 0 0;0.51 0.46 0;0.5 0.46 0;0.5 0 100;0.51 0 100;0.51 0.46 100;0.5 0.46 100];
+
+%% a slit of width 0.06(1)
+%vertices_matrix = [ 0.5 0 0;0.51 0 0;0.51 0.47 0;0.5 0.47 0;0.5 0 100;0.51 0 100;0.51 0.47 100;0.5 0.47 100];
+
+%% a slit of width 0.04(1)
+%vertices_matrix = [ 0.5 0 0;0.51 0 0;0.51 0.48 0;0.5 0.48 0;0.5 0 100;0.51 0 100;0.51 0.48 100;0.5 0.48 100];
+
+%% a slit of width 0.05(1)
+%vertices_matrix = [ 0.5 0 0;0.51 0 0;0.51 0.475 0;0.5 0.475 0;0.5 0 100;0.51 0 100;0.51 0.475 100;0.5 0.475 100];
+
+faces_matrix = [1 2 6 5;  2 3 7 6;3 4 8 7;4 1 5 8;1 2 3 4;5 6 7 8];
+h = patch('Vertices',vertices_matrix,'Faces',faces_matrix,...
+    'FaceVertexCData',hsv(8),'FaceColor',[0 0 1]);
+light('Position',[0.5 0.5 100],'Style','local')
+alpha(h,.5)
+view(3)
+grid on;
+
+%% a slit of width 0.2(1)
+%vertices_matrix = [ 0.5 0 0;0.51 0 0;0.51 0.4 0;0.5 0.4 0;0.5 0 100;0.51 0 100;0.51 0.4 100;0.5 0.4 100];
+
+%% a slit of width 0.1(1)
+vertices_matrix = [ 0.5 0 0;0.51 0 0;0.51 0.45 0;0.5 0.45 0;0.5 0 100;0.51 0 100;0.51 0.45 100;0.5 0.45 100];
+
+%% a slit of width 0.08(1)
+%vertices_matrix = [ 0.5 0 0;0.51 0 0;0.51 0.46 0;0.5 0.46 0;0.5 0 100;0.51 0 100;0.51 0.46 100;0.5 0.46 100];
+
+%% a slit of width 0.06(1)
+%vertices_matrix = [ 0.5 0 0;0.51 0 0;0.51 0.47 0;0.5 0.47 0;0.5 0 100;0.51 0 100;0.51 0.47 100;0.5 0.47 100];
+
+%% a slit of width 0.04(1)
+%vertices_matrix = [ 0.5 0 0;0.51 0 0;0.51 0.48 0;0.5 0.48 0;0.5 0 100;0.51 0 100;0.51 0.48 100;0.5 0.48 100];
+
+%% a slit of width 0.05(1)
+%vertices_matrix = [ 0.5 0 0;0.51 0 0;0.51 0.475 0;0.5 0.475 0;0.5 0 100;0.51 0 100;0.51 0.475 100;0.5 0.475 100];
+
+faces_matrix = [1 2 6 5;  2 3 7 6;3 4 8 7;4 1 5 8;1 2 3 4;5 6 7 8];
+h = patch('Vertices',vertices_matrix,'Faces',faces_matrix,...
+    'FaceVertexCData',hsv(8),'FaceColor',[0 0 1]);
+light('Position',[0.5 0.5 100],'Style','local')
+alpha(h,.5)
+view(3)
+grid on;
+
+%% a slit of width 0.2(2)
+%vertices_matrix = [ 0.5 0.605 0;0.51 0.605 0;0.51 1 0;0.5 1 0;0.5 0.605 100;0.51 0.605 100;0.51 1 100;0.5 1 100];
+
+%% a slit of width 0.1(2)
+vertices_matrix = [ 0.5 0.55 0;0.51 0.55 0;0.51 1 0;0.5 1 0;0.5 0.55 100;0.51 0.55 100;0.51 1 100;0.5 1 100];
+
+%% a slit of width 0.08(2)
+%vertices_matrix = [ 0.5 0.54 0;0.51 0.54 0;0.51 1 0;0.5 1 0;0.5 0.54 100;0.51 0.54 100;0.51 1 100;0.5 1 100];
+
+%% a slit of width 0.06(2)
+%vertices_matrix = [ 0.5 0.53 0;0.51 0.53 0;0.51 1 0;0.5 1 0;0.5 0.53 100;0.51 0.53 100;0.51 1 100;0.5 1 100];
+
+%% a slit of width 0.04(2)
+%vertices_matrix = [ 0.5 0.52 0;0.51 0.52 0;0.51 1 0;0.5 1 0;0.5 0.52 100;0.51 0.52 100;0.51 1 100;0.5 1 100];
+
+%% a slit of width 0.05(2)
+%vertices_matrix = [ 0.5 0.53 0;0.51 0.53 0;0.51 1 0;0.5 1 0;0.5 0.53 100;0.51 0.53 100;0.51 1 100;0.5 1 100];
+
+faces_matrix = [1 2 6 5;  2 3 7 6;3 4 8 7;4 1 5 8;1 2 3 4;5 6 7 8];
+h = patch('Vertices',vertices_matrix,'Faces',faces_matrix,...
+    'FaceVertexCData',hsv(8),'FaceColor',[0 0 1]);
+light('Position',[0.5 0.5 100],'Style','local')
+alpha(h,.5)
+view(3)
+grid on;
+
+axis([0 1 0 1 0 150]); 
+title('Isometric view','fontsize',15); 
+        xlabel('x','fontsize',13);
+        ylabel('y','fontsize',13);
+        xticks([0:0.5:1])
+        yticks([0:0.5:1])
+        zticks([0:50:100])
+        zlabel('\psi^*\psi','fontsize',13);
+        hold off;
+        view([45,40])
+        colormap('jet')
+        drawnow;
+        grid off; 
+        box off;
+        
+        subplot(133)
+    p=waterfall(x,y, prob_density);
+    alpha(p,.1)
+    shading interp; %uniformity
+    ax1 = gca; % current axes
+    ax1.XColor = 'k';
+    ax1.YColor = 'k';
+    ax1.ZColor = 'w';
+hold on   
+
+%% a slit of width 0.2(1)
+%vertices_matrix = [ 0.5 0 0;0.51 0 0;0.51 0.4 0;0.5 0.4 0;0.5 0 100;0.51 0 100;0.51 0.4 100;0.5 0.4 100];
+
+%% a slit of width 0.1(1)
+vertices_matrix = [ 0.5 0 0;0.51 0 0;0.51 0.45 0;0.5 0.45 0;0.5 0 100;0.51 0 100;0.51 0.45 100;0.5 0.45 100];
+
+%% a slit of width 0.08(1)
+%vertices_matrix = [ 0.5 0 0;0.51 0 0;0.51 0.46 0;0.5 0.46 0;0.5 0 100;0.51 0 100;0.51 0.46 100;0.5 0.46 100];
+
+%% a slit of width 0.06(1)
+%vertices_matrix = [ 0.5 0 0;0.51 0 0;0.51 0.47 0;0.5 0.47 0;0.5 0 100;0.51 0 100;0.51 0.47 100;0.5 0.47 100];
+
+%% a slit of width 0.04(1)
+%vertices_matrix = [ 0.5 0 0;0.51 0 0;0.51 0.48 0;0.5 0.48 0;0.5 0 100;0.51 0 100;0.51 0.48 100;0.5 0.48 100];
+
+%% a slit of width 0.05(1)
+%vertices_matrix = [ 0.5 0 0;0.51 0 0;0.51 0.475 0;0.5 0.475 0;0.5 0 100;0.51 0 100;0.51 0.475 100;0.5 0.475 100];
+
+faces_matrix = [1 2 6 5;  2 3 7 6;3 4 8 7;4 1 5 8;1 2 3 4;5 6 7 8];
+h = patch('Vertices',vertices_matrix,'Faces',faces_matrix,...
+    'FaceVertexCData',hsv(8),'FaceColor',[0 0 1]);
+light('Position',[0.5 0.5 100],'Style','local')
+alpha(h,.5)
+view(3)
+grid on;
+
+%% a slit of width 0.2(2)
+%vertices_matrix = [ 0.5 0.605 0;0.51 0.605 0;0.51 1 0;0.5 1 0;0.5 0.605 100;0.51 0.605 100;0.51 1 100;0.5 1 100];
+
+%% a slit of width 0.1(2)
+vertices_matrix = [ 0.5 0.55 0;0.51 0.55 0;0.51 1 0;0.5 1 0;0.5 0.55 100;0.51 0.55 100;0.51 1 100;0.5 1 100];
+
+%% a slit of width 0.08(2)
+%vertices_matrix = [ 0.5 0.54 0;0.51 0.54 0;0.51 1 0;0.5 1 0;0.5 0.54 100;0.51 0.54 100;0.51 1 100;0.5 1 100];
+
+%% a slit of width 0.06(2)
+%vertices_matrix = [ 0.5 0.53 0;0.51 0.53 0;0.51 1 0;0.5 1 0;0.5 0.53 100;0.51 0.53 100;0.51 1 100;0.5 1 100];
+
+%% a slit of width 0.04(2)
+%vertices_matrix = [ 0.5 0.52 0;0.51 0.52 0;0.51 1 0;0.5 1 0;0.5 0.52 100;0.51 0.52 100;0.51 1 100;0.5 1 100];
+
+%% a slit of width 0.05(2)
+%vertices_matrix = [ 0.5 0.53 0;0.51 0.53 0;0.51 1 0;0.5 1 0;0.5 0.53 100;0.51 0.53 100;0.51 1 100;0.5 1 100];
+
+faces_matrix = [1 2 6 5;  2 3 7 6;3 4 8 7;4 1 5 8;1 2 3 4;5 6 7 8];
+h = patch('Vertices',vertices_matrix,'Faces',faces_matrix,...
+    'FaceVertexCData',hsv(8),'FaceColor',[0 0 1]);
+light('Position',[0.5 0.5 100],'Style','local')
+alpha(h,.5)
+view(3)
+grid on;
+
+axis([0 1 0 1 0 150]); 
+title('Top view','fontsize',15); 
+        xlabel('x','fontsize',13);
+        ylabel('y','fontsize',13);
+        xticks([0:0.5:1])
+        yticks([0:0.5:1])
+        zticks([0:50:100])
+        zlabel('\psi^*\psi','fontsize',13);
+        hold off;
+        view([0,90])
+        colormap('jet') 
+        drawnow;
+        grid off; 
+        box off;
+end
+end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% % Calculate the imaginary part of the wavefunction at time % t=t+delta_t/2,, t + 3*delta_t/2 etc
+% % given the value at time t. Vectorise for speed.
+function [I_next]= imag_psi_2D(N, I_current, R_current, delta_t, delta_x, V) 
+I_next= zeros(N,N);
+s=delta_t/(2*delta_x^2);
+x=2:N-1; 
+y=2:N-1;
+% Calculate the imaginary part of the wavefunction at time t=t+delta_t, % given the value at time t.
+I_next(x,y)=I_current(x,y) +s*(R_current(x+1,y)-2*R_current(x,y)+R_current(x- 1,y)+R_current(x,y+1)-2*R_current(x,y)+R_current(x,y-1))...
+-delta_t*V(x,y).*R_current(x,y);
+end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% %
+% % Calculate the real part of the wavefunction at time t=t+delta_t,
+% t+2*delta_t etc....
+% % given the value at time t. Vectorise for speed.
+function [R_next]= real_psi_2D(N, R_current, I_current, delta_t, delta_x, V) 
+R_next= zeros(N,N);
+s=delta_t/(2*delta_x^2);
+x=2:N-1; 
+y=2:N-1;
+% Calculate the real part of the wavefunction at time t=t+delta_t, % given the value at time t.
+R_next(x,y)=R_current(x,y) - s*(I_current(x+1,y)-2*I_current(x,y)+I_current(x- 1,y)+I_current(x,y+1)-2*I_current(x,y)+I_current(x,y-1))...
++delta_t*V(x,y).*I_current(x,y);
+end
