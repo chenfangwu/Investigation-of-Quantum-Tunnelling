@@ -1,0 +1,89 @@
+clc;%initialise
+clear;
+h=1;%planck's constant
+m=1;%the mass of the particle
+delta=0.001;
+N=1000;
+x= linspace(0,1,N); 
+L=1;
+A=200;
+k=pi;
+E=(((k).^2).*(h.^2))./(2*m)
+V1=-A*sin(k.*x);%harmoninc potential
+V=((V1+200).*5e3)-1.2362
+x_0=0.5;
+C=10;
+sigma_squared=0.001;
+k_0=500; %k0=1,500
+% Discretisation parameters
+delta_x=1e-3;
+delta_t=5e-7;
+%  Generate an intial wavepacket
+psi=C*exp(-(x-x_0).^2/sigma_squared).*exp(1i*k_0*x);
+
+% % Extract the real and imaginary parts of the wavefunction 
+R_initial=real(psi);
+I_initial=imag(psi); 
+
+% Initialise current real and imaginary parts of psi
+ 
+ I_current=I_initial;
+ R_current=R_initial;
+ 
+% Initial run of Im(psi) to start off leapfrog process;
+ 
+% t=t+delta_t/2; 
+ 
+[I_next] = imag_psi(N, I_current, R_current, delta_t, delta_x, V); 
+ 
+% % Do the leapfrog!!
+% 
+ for time_step = 1:1000;%10, 400,800, 1050, 1400, 2200, 2800, 3200, 3500, 4000%20000
+ T=round(delta_t.*time_step.*1E3 ,1)
+ 
+     
+% evaluate R at delta_t, 2*delta_t, 3*delta_t.......    
+%     Time is incremented by  t=t+delta_t/2 every call;   
+ 
+     [R_next]=real_psi(N, R_current, I_current, delta_t, delta_x, V);
+     
+     R_current=R_next;
+    % evaluate I at (3/2)*delta_t, (5/2)*delta_t............      
+    % Time is incremented by  t=t+delta_t/2 every call;
+    
+     [I_next] = imag_psi(N, I_current, R_current, delta_t, delta_x, V); 
+    
+     % calculate psi*psi  with R(t) and  I(t+delta_t/2) and I(t-delta_t/2)      
+     
+     prob_density=R_current.^2+I_next.*I_current;
+ 
+     I_current=I_next;
+      
+% Visualise results with movie. Plot every 10 calculations for speed 
+ 
+        if rem(time_step, 10)== 0;
+            %figure(2)
+               yyaxis left
+               plot(x, prob_density-200);
+               axis([0 1 -200 0])
+                % ax1 = gca; % current axes
+                 %ax1.XColor = 'k';
+                %ax1.YColor = 'k';
+               hold on 
+               plot(x,V1,'r-');%harmonic potential line第四象限
+               ylabel('\psi^*\psi','fontsize',20); 
+               yticks([-200:100:0])
+               yticklabels({'0','100','200','fontsize',20})
+               xlabel('x','fontsize',20 );
+               xticks([0:0.2:1])
+               %title('Harmonic potential','fontsize',15);
+               title( ['Time = ',num2str(T),'ms'] ,'fontsize',15)
+               yyaxis right
+               yticks([0:0.2:1])
+               ylabel('Potential energy','fontsize',20); 
+               yticklabels({'0',' ',' ',' ',' ','1x10^6'})
+               box off
+               hold off
+               drawnow;
+        end;   
+ end;
