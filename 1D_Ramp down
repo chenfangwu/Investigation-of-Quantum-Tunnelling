@@ -1,0 +1,79 @@
+% %  Initialise and set up initial waveform
+clear;
+figure
+N=1000; 
+x= linspace(0,1,N); 
+% Set up intial wavepacket;
+x_0=0.2;
+C=10;
+sigma_squared=1e-3;
+k_0=500;
+% Discretisation parameters
+delta_x=1e-3;
+delta_t=5e-7;
+%  Generate an intial wavepacket
+ psi=C*exp(-(x-x_0).^2/sigma_squared).*exp(1i*k_0*x);
+% % Extract the real and imaginary parts of the wavefunction 
+R_initial=real(psi);
+I_initial=imag(psi); 
+V= zeros(1, N);%ramp down Potential wall
+V=1000:-1:0
+V=V*5e2
+
+% Initialise current real and imaginary parts of psi
+ 
+ I_current=I_initial;
+ R_current=R_initial;
+ 
+% Initial run of Im(psi) to start off leapfrog process;
+ 
+% t=t+delta_t/2; 
+ 
+[I_next] = imag_psi(N, I_current, R_current, delta_t, delta_x, V); 
+ 
+% % Do the leapfrog!!
+% 
+ for time_step = 1:2000; 
+  T=round(delta_t.*time_step.*1E3 ,1)  
+% evaluate R at delta_t, 2*delta_t, 3*delta_t.......    
+%     Time is incremented by  t=t+delta_t/2 every call;   
+     [R_next]=real_psi(N, R_current, I_current, delta_t, delta_x, V);
+     
+     R_current=R_next;
+    % evaluate I at (3/2)*delta_t, (5/2)*delta_t............      
+    % Time is incremented by  t=t+delta_t/2 every call;
+    
+     [I_next] = imag_psi(N, I_current, R_current, delta_t, delta_x, V); 
+    
+     % calculate psi*psi  with R(t) and  I(t+delta_t/2) and I(t-delta_t/2)      
+     
+     prob_density=R_current.^2+I_next.*I_current;
+ 
+     I_current=I_next;
+      
+% Visualise results with movie. Plot every 10 calculations for speed 
+ 
+               if rem(time_step, 10)== 0;
+               figure(2)
+               yyaxis left
+               plot(x, prob_density);
+               axis([0 1 0 200])
+               hold on 
+               ylabel('\psi^*\psi','fontsize',20); 
+               yticks(0:100:200);
+               %yticklabels({'0',' ','100',' ','200'})
+               xlabel('x','fontsize',20 );
+               xticks([0:0.2:1])
+               xticklabels({'0.0','0.2','0.4','0.6','0.8','1.0'});
+               title( ['Time = ',num2str(T),' ms'] ,'fontsize',15)
+               plot([0 1],[200 0],'-r')
+               
+               yyaxis right
+               yticks([0:0.2:1])
+               ylabel('Potential energy','fontsize',20); 
+               yticklabels({'0',' ',' ',' ',' ','5x10^5'})
+               box off
+               hold off
+               drawnow;
+        end;   
+ end;
