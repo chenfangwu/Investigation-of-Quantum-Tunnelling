@@ -1,0 +1,86 @@
+% %  Initialise and set up initial waveform
+clear;
+N=1000 
+V= zeros(1, N);
+x= linspace(0,1,N); 
+delta_E=0.1;
+% Set up intial wavepacket;
+x_0=0.2;
+C=10;
+sigma_squared=1e-3;
+k_0=700;
+% Discretisation parameters
+delta_x=1e-3;
+delta_t=5e-7;
+minimum_delta_E=0.005;
+
+V= zeros(1, N);
+V(600:610) =-3*k_0^2;
+V(800:810) =-6*k_0^2;
+%  Generate an intial wavepacket
+ psi=C*exp(-(x-x_0).^2/sigma_squared).*exp(1i*k_0*x);
+% % Extract the real and imaginary parts of the wavefunction 
+E_initial=1.879;
+R_initial=real(psi);
+I_initial=imag(psi); 
+% Initialise current real and imaginary parts of psi
+ 
+ I_current=I_initial;
+ R_current=R_initial;
+ E=E_initial;
+ 
+% Initial run of Im(psi) to start off leapfrog process;
+% t=t+delta_t/2; 
+ 
+%[I_next] = imag_psi(N, I_current, R_current, delta_t, delta_x, V); 
+% % Do the leapfrog!!
+% 
+ for time_step = 1:4000;   
+     T=round(delta_t.*time_step.*1E3 ,1)   
+% evaluate R at delta_t, 2*delta_t, 3*delta_t.......    
+%     Time is incremented by  t=t+delta_t/2 every call;   
+ 
+     [R_next]=real_psi(N, R_current, I_current, delta_t, delta_x, V);
+     
+     R_current=R_next;
+    % evaluate I at (3/2)*delta_t, (5/2)*delta_t............      
+    % Time is incremented by  t=t+delta_t/2 every call;
+    
+     [I_next] = imag_psi(N, I_current, R_current, delta_t, delta_x, V); 
+    
+     % calculate psi*psi  with R(t) and  I(t+delta_t/2) and I(t-delta_t/2)      
+     
+     prob_density=R_current.^2+I_next.*I_current;
+ 
+     I_current=I_next;
+      
+% Visualise results with movie. Plot every 10 calculations for speed 
+ 
+        if rem(time_step, 10)== 0;
+            yyaxis left;
+               plot(x, prob_density); 
+               hold on;
+               plot([0 0.6],[0 0],'r-')
+               plot([0.6 0.6],[0 -100],'r-')
+               plot([0.6 0.61],[-100 -100],'r-')
+               plot([0.61 0.61],[-100 0],'r-')
+               plot([0.61 0.8],[0 0],'r-')
+               plot([0.8 0.8],[0 -200],'r-')
+               plot([0.8 0.81],[-200 -200],'r-')
+               plot([0.81 0.81],[-200 0],'r-')
+               plot([0.81 1],[0 0],'r-')
+               title(['Time = ',num2str(T),'ms'],'fontsize',15);
+               axis([0 1 -200 200]);
+               xlabel('x','fontsize',13);
+               ylabel('\psi^*\psi','fontsize',20);  
+               xticks(0:0.2:1);
+               yticks(-200:200:0);
+               box off
+             yyaxis right;
+              yticks(0:0.25:0.5);
+               ylabel('Potential energy','fontsize',20);
+               yticklabels({'-3.0x10^6','-1.5x10^6','0'}) %Vo=0.5k_0^2
+              hold off 
+              drawnow;
+        end;   
+ end;
