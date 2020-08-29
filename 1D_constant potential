@@ -1,0 +1,80 @@
+clear;
+N=1000;
+x= linspace(0,1,N); 
+
+x_0=0.2;% Set up intial wavepacket;
+C=10;%amplitude  
+sigma_squared=1e-3;%standard deviation
+k_0=500;%velocity
+lambda=2*pi./k_0
+% Discretisation parameters
+ 
+delta_x=1e-3;
+delta_t=5e-7;
+% 
+%  Generate an intial wavepacket
+% 
+ psi=C*exp(-(x-x_0).^2/sigma_squared).*exp(1i*k_0*x);
+%
+% % Extract the real and imaginary parts of the wavefunction 
+% 
+R_initial=real(psi);
+I_initial=imag(psi);
+ 
+ 
+
+V= zeros(1, N);
+x= linspace(0,1,N); 
+%V(1:N) =1e3;
+%V(800:N) =0;
+
+ 
+% Initialise current real and imaginary parts of psi
+ 
+ I_current=I_initial;
+ R_current=R_initial;
+ 
+% Initial run of Im(psi) to start off leapfrog process;
+ 
+% t=t+delta_t/2; 
+ 
+[I_next] = imag_psi(N, I_current, R_current, delta_t, delta_x, V); 
+ 
+% % Do the leapfrog!!
+% 
+ for time_step = 1:2400; %2400
+    T=round(delta_t.*time_step.*1E3 ,1)
+% evaluate R at delta_t, 2*delta_t, 3*delta_t.......    
+%     Time is incremented by  t=t+delta_t/2 every call;   
+ 
+     [R_next]=real_psi(N, R_current, I_current, delta_t, delta_x, V);
+     
+     R_current=R_next;
+    % evaluate I at (3/2)*delta_t, (5/2)*delta_t............      
+    % Time is incremented by  t=t+delta_t/2 every call;
+    
+     [I_next] = imag_psi(N, I_current, R_current, delta_t, delta_x, V); 
+    
+     % calculate psi*psi  with R(t) and  I(t+delta_t/2) and I(t-delta_t/2)      
+     
+     prob_density=R_current.^2+I_next.*I_current;
+ 
+     I_current=I_next;
+      
+% Visualise results with movie. Plot every 10 calculations for speed 
+ 
+        if rem(time_step, 10)== 0;
+               %subplot(211)
+               plot(x, prob_density); 
+               %title('Constant potential','fontsize',15);
+              title( ['Time = ',num2str(T),' ms'] ,'fontsize',15)
+               axis([0 1 0 100]);
+               xlabel('x','fontsize',20);
+               ylabel('\psi^*\psi','fontsize',20);  
+               xticks(0:0.2:1);
+               xticklabels({'0.0','0.2','0.4','0.6','0.8','1.0'})
+               yticks(0:50:200);
+               box off
+              drawnow;
+        end;   
+ end;
